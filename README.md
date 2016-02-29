@@ -1,2 +1,4 @@
-# Arduino-Mega
-Arduino Mega2560
+# Arduino
+Sketches
+	Uno
+	Mega2560
