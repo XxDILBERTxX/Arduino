@@ -11,6 +11,7 @@
 #define BIN2 13 //motor
 #define MOTOR_R 2 //Right motor right as 2,
 
+//others
 #define STBPin 14 //Standby
 #define pingPinR 5 // Pins of sensor
 #define pingPinL 6 // Pins of sensor
