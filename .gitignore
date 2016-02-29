@@ -5,3 +5,4 @@ __vm
 *.atsln
 Release
 *.DS_Store
+*.vsarduino.h
