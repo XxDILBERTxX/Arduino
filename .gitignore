@@ -1,0 +1,7 @@
+*.cppproj
+.vs
+Debug
+__vm
+*.atsln
+Release
+*.DS_Store
