@@ -1,8 +1,9 @@
-*.cppproj
-.vs
 Debug
-__vm
-*.atsln
 Release
+.vs
+__vm
+*.cppproj
+*.atsln
 *.DS_Store
 *.vsarduino.h
+*.componentinfo.xml
