@@ -1,112 +1,114 @@
-// My Ping Tank
+#include <Ping.h>
 
-//Motor left
-#define PWMA 9 //Speed control
-#define AIN1 8 //motor
-#define AIN2 11 //motor
-#define MOTOR_L 1 //Left motor as 1,
-//Motor right
-#define PWMB 10 //Speed control
-#define BIN1 12 //motor
-#define BIN2 13 //motor
-#define MOTOR_R 2 //Right motor right as 2,
+#define speedPinLeft 10 //Speed Left
+#define IN3 12
+#define IN4 13
+#define Left 1
 
-//others
-#define STBPin 14 //Standby
-#define pingPinR 5 // Pins of sensor
-#define pingPinL 6 // Pins of sensor
-long durationL, inchesL, durationR, inchesR;
-int pingpins[] = {5,6};
-int stbcs = LOW;
-int stbls = LOW;
-int stb;
+#define speedPinRight 9 //Speed Right
+#define IN1 8
+#define IN2 11
+#define Right 0
+
+#define STBPin 4 //Override
+
+#define PINGS 3
+int pingLog[PINGS];
+Ping pingL = Ping(5, 0, 0);
+Ping pingR = Ping(6, 0, 0);
+
+
+boolean stb = true;
+
+unsigned long current_time = 0;
+unsigned long last_touched_time = 0;
+//unsigned long
 
 void setup(){
 	pinMode(STBPin, INPUT);
-	pinMode(PWMA, OUTPUT);
-	pinMode(AIN1, OUTPUT);
-	pinMode(AIN2, OUTPUT);
-	pinMode(PWMB, OUTPUT);
-	pinMode(BIN1, OUTPUT);
-	pinMode(BIN2, OUTPUT);
-	//Serial.begin(9600);
+	pinMode(speedPinRight, OUTPUT);
+	pinMode(IN1, OUTPUT);
+	pinMode(IN2, OUTPUT);
+	pinMode(speedPinLeft, OUTPUT);
+	pinMode(IN3, OUTPUT);
+	pinMode(IN4, OUTPUT);
+	Serial.begin(115200);
 }
 
+int oldLeftDist = 0;
+int oldRightdist = 0;
 void loop(){
-
-	if(ping(1) >= 15 && ping(0) >= 15){
-		move(MOTOR_L, 245, 0); //Motor left,
-		move(MOTOR_R, 245, 0); //Motor right,
+	current_time = millis();
+	
+	pingL.fire();
+	int LeftDist = (oldLeftDist + pingL.inches())/2;
+	oldLeftDist = LeftDist;
+	
+	pingR.fire();
+	int RightDist= (oldRightdist+ pingR.inches())/2;
+	oldRightdist = RightDist;
+	
+	if(digitalRead(STBPin) && current_time - last_touched_time > 500) //Override
+	{
+		last_touched_time = current_time;
+		stb = !stb;
 	}
-	else if(ping(1) < 4 || ping(0) < 4){
-		move(MOTOR_L, 200, 1);
-		move(MOTOR_R, 200, 1);
+		
+	if(LeftDist >= 15 && RightDist >= 15){
+		move(Left, 245, 0); //Motor left,
+		move(Right, 245, 0); //Motor right,
+		Serial.print(" | Forward ");
 	}
-	else if(ping(0) < 7 && ping(1) >= 7){
-		move(MOTOR_L, 230, 1);
-		move(MOTOR_R, 230, 0);
+	else if(LeftDist < 5 || RightDist < 5){
+		move(Left, 200, 1);
+		move(Right, 200, 1);
+		Serial.print(" | Backward ");
 	}
-	else if(ping(1) < 7 && ping(0) >= 7){
-		move(MOTOR_L, 230, 0);
-		move(MOTOR_R, 230, 1);
-
+	else if(RightDist < 10 && LeftDist >= 7){
+		move(Left, 230, 1);
+		move(Right, 230, 0);
+		Serial.print(" | Left Turn ");
+	}
+	else if(LeftDist < 10 && RightDist >= 7){
+		move(Left, 230, 0);
+		move(Right, 230, 1);
+		Serial.print(" | Right Turn ");
 	}
 	
-	stbcs = digitalRead(STBPin);
-	if(stbcs == HIGH && stbls == LOW){
-		delay(1);
-		if(stb == HIGH){
-			stb = LOW;
-			}else{
-			stb = HIGH;
-		}
-	}
-	stbls = stbcs;
+	//
+	Serial.print(" | LeftDist: ");
+	Serial.print(LeftDist);
+	Serial.print(" | RightDist: ");
+	Serial.print(RightDist);
 	
+	Serial.print(" | On: ");
+	Serial.print(stb);
+	
+	
+	Serial.println();
+	Serial.println();
 }
 
 void move(int motor, int speed, int direction){
 	boolean inPin1 = LOW;
 	boolean inPin2 = HIGH;
 	
-	if(stb == LOW){ speed = LOW;} //Overide
+	if(stb){speed = LOW;} //Override
 	
 	if(direction == 1){
 		inPin1 = HIGH;
 		inPin2 = LOW;
 	}
 
-	if(motor == 1){
-		digitalWrite(AIN1, inPin1);
-		digitalWrite(AIN2, inPin2);
-		analogWrite(PWMA, speed);
+	if(motor == 0){
+		digitalWrite(IN1, inPin1);
+		digitalWrite(IN2, inPin2);
+		analogWrite(speedPinRight, speed);
 	}
 	else{
-		digitalWrite(BIN1, inPin1);
-		digitalWrite(BIN2, inPin2);
-		analogWrite(PWMB, speed);
+		digitalWrite(IN3, inPin1);
+		digitalWrite(IN4, inPin2);
+		analogWrite(speedPinLeft, speed);
 	}
 }
 
-//Delayed Off
-//if(digitalRead(SENSOR_R)==LOW) TimerR = millis();
-//  if(millis() - TimerR <= 1000UL) sensors +=1;
-//if(digitalRead(SENSOR_L)==LOW) TimerL = millis();
-//  if(millis() - TimerL <= 1000UL) sensors +=2;
-
-unsigned long ping(int i){
-	unsigned long echo;
-	for(int i=0; i < 1; i++){
-		pinMode(pingpins[i], OUTPUT); // Switch signalpin to output
-		digitalWrite(pingpins[i], LOW); // Send low pulse
-		delayMicroseconds(2); // Wait for 2 microseconds
-		digitalWrite(pingpins[i], HIGH); // Send high pulse
-		delayMicroseconds(5); // Wait for 5 microseconds
-		digitalWrite(pingpins[i], LOW); // Holdoff
-		pinMode(pingpins[i], INPUT); // Switch signalpin to input
-		digitalWrite(pingpins[i], HIGH); // Turn on pullup resistor
-		echo = pulseIn(pingpins[i], HIGH); //Listen for echo
-		return (echo / 58.138) * .39; //convert to CM then to inches
-		delay(10);
-	}
-}
