@@ -1,5 +1,5 @@
 # Arduino
-Sketches
-	Uno
+Sketches:
+	Uno, 
 	Mega2560
 	
