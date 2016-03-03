@@ -1006,16 +1006,17 @@ void ChangePaletteAndSettings() //Mode Defaults
 	{
 		case 0:
 		SETTING[1] = 1000; //Speed
-		SETMIN[1] = 100;
-		//FLASH_CHANCE = 64; // not imp
-		//BURST_CHANCE = 64; // not imp
+		SETMIN[1] = 10;
+		//FLASH_CHANCE = 64; // not impl 
+		//BURST_CHANCE = 64; // not impl
 		SETTING[9] = 1000; // Random Launch time max
 		break;
 
 		case 1:
 		SETTING[2] = 0;
 		gPal = HeatColors_p;
-		SETTING[1] = 60;
+		SETTING[1] = 1000; //Speed
+		SETMIN[1] = 10;
 		SETTING[3] = 60; //Cooling
 		SETTING[4] = 30; //Sparking
 		break;
