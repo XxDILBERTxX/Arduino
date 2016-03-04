@@ -1010,8 +1010,13 @@ void ChangePaletteAndSettings() //Mode Defaults
 		case 0:
 		SETTING[1] = 1000; //Speed
 		SETMIN[1] = 10;
+<<<<<<< HEAD
 		//FLASH_CHANCE = 64; // not imp
 		//BURST_CHANCE = 64; // not imp
+=======
+		//FLASH_CHANCE = 64; // not impl 
+		//BURST_CHANCE = 64; // not impl
+>>>>>>> bd2fb9be321ba9f9eb9d20d4a4b7939bf16291e9
 		SETTING[9] = 1000; // Random Launch time max
 		break;
 
