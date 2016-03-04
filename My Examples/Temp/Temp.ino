@@ -27,7 +27,7 @@ void loop(){
 	}
 	temp[0] = R;
 	
-	float temperatureF = average(temp, tempcheck);
+	temperatureF = average(temp, tempcheck);
 	int val = map(temperatureF, 60, 90, 0, 32);
 	int val2 = map(temperatureF, 60, 90, 0, 255);
 	val = constrain(val, 0 , 32);

@@ -68,8 +68,10 @@ String MODEID[] =
 	"Fly (WIP)"
 };
 
-#define MAXMENUMODE (sizeof(SETTING) / sizeof(SETTING[0]))
-#define MAXMODE (sizeof(MODEID) / sizeof(MODEID[0]))
+//#define MAXMENUMODE (sizeof(SETTING) / sizeof(SETTING[0])) //works but debug does not like
+//#define MAXMODE (sizeof(MODEID) / sizeof(MODEID[0]))
+#define MAXMENUMODE 11
+#define MAXMODE 4
 int MODESET[MAXMODE][MAXMENUMODE] = // Mode Settings List (Add Setting # to allow)
 {
 	0, 1, 0, 0, 0, 0, 0, 0, 0, 9, 10,
@@ -84,6 +86,7 @@ int MODESET[MAXMODE][MAXMENUMODE] = // Mode Settings List (Add Setting # to allo
 #define WINDOW_X_MAX (WINDOW_X_MIN + ledMatrixWidth - 1)
 #define WINDOW_Y_MIN (PIXEL_Y_OFFSET)
 #define WINDOW_Y_MAX (WINDOW_Y_MIN + ledMatrixHeight - 1)
+
 CRGB overrun;
 CRGB& XYs(byte x, byte y)
 {
@@ -114,7 +117,6 @@ CRGB& XYs(byte x, byte y)
 		return overrun;
 	}
 }
-
 void screenscale( accum88 a, byte N, byte& screen, byte& screenerr)
 {
 	byte ia = a >> 8;
@@ -184,8 +186,8 @@ class Dot
 		byte iy, ye, yc;
 		screenscale( x, MODEL_WIDTH, ix, xe);
 		screenscale( y, MODEL_HEIGHT, iy, ye);
-		yc = 255 - ye;
 		xc = 255 - xe;
+		yc = 255 - ye;
 
 		CRGB c00 = CRGB( dim8_video( scale8( scale8( color.r, yc), xc)),
 		dim8_video( scale8( scale8( color.g, yc), xc)),
@@ -271,7 +273,7 @@ class Dot
 		if ( theType == SPARK)
 		{
 			if ( ((xv >  0) && (x > xv)) ||
-			((xv < 0 ) && (x < (65535 + xv))) ) //65535 with 0xFFFF
+			((xv < 0 ) && (x < (65535 + xv))) ) //65535 = 0xFFFF
 			{
 				x += xv;
 			}
@@ -295,7 +297,7 @@ class Dot
 		xv = (int16_t)random16(600) - (int16_t)300;
 		y = 0;
 		//x = 0x8000; //=32768 / 16384 / 8192
-		x = ((0x8000) + ((int16_t)random16(16384) - (int16_t)8192));
+		x = ((32768) + ((int16_t)random16(16384) - (int16_t)8192));
 		hsv2rgb_rainbow( CHSV( random8(), 240, 200), color);
 		theType = SHELL;
 		show = 1;
@@ -339,7 +341,7 @@ void setup()
 
 void loop()
 {
-	random16_add_entropy( random()); // Add entropy to random number generator; we use a lot of it.
+	random16_add_entropy(random()); // Add entropy to random number generator; we use a lot of it.
 	current_time = millis();
 
 	if (current_time - last_touched_time > 5000UL)
@@ -471,6 +473,7 @@ void loop()
 			blur();
 			break;
 		}
+
 	}
 	LEDS.setBrightness(SETTING[10]);
 }
@@ -1006,7 +1009,7 @@ void ChangePaletteAndSettings() //Mode Defaults
 	{
 		case 0:
 		SETTING[1] = 1000; //Speed
-		SETMIN[1] = 100;
+		SETMIN[1] = 10;
 		//FLASH_CHANCE = 64; // not imp
 		//BURST_CHANCE = 64; // not imp
 		SETTING[9] = 1000; // Random Launch time max
@@ -1015,7 +1018,8 @@ void ChangePaletteAndSettings() //Mode Defaults
 		case 1:
 		SETTING[2] = 0;
 		gPal = HeatColors_p;
-		SETTING[1] = 60;
+		SETTING[1] = 1000; //Speed
+		SETMIN[1] = 10;
 		SETTING[3] = 60; //Cooling
 		SETTING[4] = 30; //Sparking
 		break;
