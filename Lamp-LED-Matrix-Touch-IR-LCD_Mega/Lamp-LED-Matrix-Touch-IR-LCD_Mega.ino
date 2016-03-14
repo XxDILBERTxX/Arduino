@@ -34,12 +34,14 @@ byte remote;
 unsigned long current_time = 0;
 unsigned long touched_time = 0;
 unsigned long last_touched_time = 0;
+unsigned long lastHueTime = 0;
 int MENUMODE = 0;
 int counter = 1;
 CRGBPalette16 gPal(HeatColors_p);
 byte colorR = 0;
 byte colorG = 0;
 byte colorB = 0;
+byte iHue = 0;
 
 //Menu-Mode (Defaults)
 String SETID[] =
@@ -392,17 +394,17 @@ void loop()
 			remoteuse = true;
 			remote = 3;
 		}
-		if (results.value == 0x290 && current_time - last_touched_time > 200) //if the button Mute
+		if (results.value == 0x290 && current_time - last_touched_time > 150) //if the button Mute
 		{
 			last_touched_time = current_time;
 			light = !light;
 			lamp();
 		}
-		if (results.value == 0x54ED && current_time - last_touched_time > 200) //if the button Sat
+		if (results.value == 0x54ED && current_time - last_touched_time > 150) //if the button Sat
 		{
 			//
 		}
-		if (results.value == 0xA90 && current_time - last_touched_time > 200) //if the button TV
+		if (results.value == 0xA90 && current_time - last_touched_time > 150) //if the button TV
 		{
 			//
 		}
@@ -476,6 +478,14 @@ void loop()
 
 	}
 	LEDS.setBrightness(SETTING[10]);
+	
+	if(current_time - lastHueTime > 1000UL) {
+		iHue += 1;
+		if(iHue > 255) {
+			iHue = 0;
+		}
+		lastHueTime = current_time;
+	}
 }
 
 void lamp()
@@ -850,8 +860,6 @@ void fillnoise8()
 
 void mapNoiseToLEDsUsingPalette()
 {
-	static uint8_t ihue = 0;
-
 	for (int i = 0; i < ledMatrixWidth; i++)
 	{
 		for (int j = 0; j < ledMatrixHeight; j++)
@@ -865,7 +873,7 @@ void mapNoiseToLEDsUsingPalette()
 			// if this palette is a 'loop', add a slowly-changing base value
 			if ( SETTING[6])
 			{
-				index += ihue;
+				index = iHue;
 			}
 
 			// brighten up, as the color palette itself often contains the
@@ -881,19 +889,17 @@ void mapNoiseToLEDsUsingPalette()
 			XYs(i, j) = ColorFromPalette( gPal, index, bri);
 		}
 	}
-	ihue += 1;
 	LEDS.show();
 }
 
 void blur() // Need to randomize movement and work on wrap
 {
 	fadeToBlackBy(leds, NUM_LEDS, 1);
-	//blur2d(leds, ledMatrixWidth, ledMatrixHeight, 172); // Fade
+	//blur2d(leds, ledMatrixWidth, ledMatrixHeight, 172); // not working on col
 
 	uint8_t  j = beatsin8(SETTING[7], 0, ledMatrixWidth - 1); //Speed, Min, Max
 	uint8_t  i = beatsin8(SETTING[8], 0, ledMatrixHeight - 1);
-
-	XYs(j, i) += CHSV(current_time / 700, 255, 255);
+	XYs(j, i) = ColorFromPalette( gPal, iHue);
 	FastLED.delay(1000 / SETTING[1]); //Speed
 }
 
@@ -971,7 +977,6 @@ void FireWorks()
 
 void Fire2012WithPalette()
 {
-	//static float hue0 = 0, hue1 = 1, hue2 = 2;
 	for (int x = 0; x < ledMatrixWidth; x++)
 	{
 		// Step 1.  Cool down every cell a little
@@ -1010,13 +1015,8 @@ void ChangePaletteAndSettings() //Mode Defaults
 		case 0:
 		SETTING[1] = 1000; //Speed
 		SETMIN[1] = 10;
-<<<<<<< HEAD
 		//FLASH_CHANCE = 64; // not imp
 		//BURST_CHANCE = 64; // not imp
-=======
-		//FLASH_CHANCE = 64; // not impl 
-		//BURST_CHANCE = 64; // not impl
->>>>>>> bd2fb9be321ba9f9eb9d20d4a4b7939bf16291e9
 		SETTING[9] = 1000; // Random Launch time max
 		break;
 
@@ -1039,10 +1039,12 @@ void ChangePaletteAndSettings() //Mode Defaults
 		break;
 
 		case 3:
+		SETTING[2] = 6;
+		gPal = RainbowColors_p;
 		SETTING[1] = 1000;
 		SETMIN[1] = 1;
-		SETTING[7] = 7; //Around Speed
-		SETTING[8] = 3; //Up-Down Speed
+		SETTING[7] = 8; //Around Speed
+		SETTING[8] = 2; //Up-Down Speed
 		break;
 	}
 }
