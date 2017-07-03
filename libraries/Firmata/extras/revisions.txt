@@ -1,3 +1,54 @@
+FIRMATA 2.5.2 - Feb 15, 2016
+
+[core library]
+* Added Wi-Fi transport (Jesse Frush)
+* Added support for Arduino MKR1000 (Jesse Frush)
+* Moved Serial feature to own class SerialFimata
+* Moved pin config and pin state handling to Firmata.cpp
+* Added new method disableBlinkVersion to provide a way to optionally bypass startup blink sequence
+
+[StandardFirmata & variants]
+* Added StandardFirmataWiFi (Jesse Frush)
+* Added ethernetConfig.h for StandardFirmataEthernet and StandardFirmtaEthernetPlus
+* Removed serialUtils.h and using SerialFirmata class instead for Serial feature
+
+FIRMATA 2.5.1 - Dec 26, 2015
+
+[core library]
+* Added support for Arduino 101
+* Make VERSION_BLINK_PIN optional
+* Separate protocol version from firmware version.
+  Use FIRMATA_PROTOCOL_VERSION_[MAJOR/MINOR/BUGFIX] for protocol and use
+  FIRMATA_FIRMWARE_VERSION_[MAJOR/MINOR/BUGFIX] for firmware (library version).
+
+[StandardFirmata & variants]
+* Added ability to auto-restart I2C transmission by setting bit 6 of byte 3
+  of the I2C_REQUEST message.
+
+FIRMATA 2.5.0 - Nov 7, 2015
+
+[core library]
+* Added Serial feature for interfacing with serial devices via hardware
+  or software serial. See github.com/firmata/protocol/serial.md for details
+* Added ability to set the value of a pin by sending a single value instead
+  of a port value. See 'set digital pin value' in github.com/firmata/protocol/protocol.md
+  for details
+* Added support for Arduino Zero board
+* Added support for Teensy LC board (copied from Teensy Firmata lib)
+* Added support for Pinoccio Scout board (Pawel Szymczykowski)
+* Lowered minimun sampling interval from 10 to 1 millisecond
+* Added new pin mode (PIN_MODE_PULLUP) for setting the INPUT_PULLUP pin mode
+* Changed pin mode defines to safer names (old names still included but
+  deprecated) - see Firmata.h
+
+[StandardFirmata & variants]
+* Created new StandardFirmataPlus that implements the Serial feature
+  Note: The new Serial features is only implemented in the "Plus" versions of
+  StandardFirmata.
+* Created new StandardFirmataEthernetPlus that implements the Serial feature
+* Fixed issue where StandardFirmata was not compiling for Intel Galileo boards
+* Moved StandardFirmataYun to its own repo (github.com/firmata/StandardFirmataYun)
+
 FIRMATA 2.4.4 - Aug 9, 2015
 
 [core library]
