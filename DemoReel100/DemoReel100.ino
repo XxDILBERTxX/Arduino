@@ -1,5 +1,5 @@
 #include "FastLED.h"
-#include <medianFilter.h>
+#include "medianFilter.h"
 
 medianFilter Filter;
 
@@ -27,7 +27,7 @@ int pot1lvl = 0;
 int pot1out = 0;
 int pot1filt = 0;
 
-int modepinState = 0;
+//int modepinState = 0;
 int typepinState = 0;
 
 unsigned long button_time = 0;  // the last time the output pin was toggled
@@ -35,8 +35,8 @@ unsigned long last_button_time = 50;
 
 void setup() {
   delay(3000); // 3 second delay for recovery
-  Serial.begin(9600);
   Filter.begin();
+  //Serial.begin(9600);
   
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
@@ -70,8 +70,8 @@ void loop()
   
   pot1val = analogRead(POT1PIN);
   pot1filt = Filter.run(pot1val);
-  pot1out = map(pot1filt, 0, 1023, 0, 255);
-  pot1lvl = map(pot1filt, 0, 1023, 0, 100);
+  pot1out = map(pot1filt, 10, 990, 0, 255);
+  pot1lvl = map(pot1filt, 10, 990, 0, 100);
   
   // read the state of the pushbutton value:
   //modepinState = digitalRead(MODE_PIN);
@@ -85,10 +85,10 @@ void loop()
   EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
   //EVERY_N_SECONDS( 60 ) { nextPattern(); } // change patterns periodically
   
-  //Serial.println(pot1val);
-  //Serial.println(pot1out);
-  //Serial.println(pot1lvl);
-  Serial.println(pot1filt);
+  //Serial.println(pot1val" ");
+  //Serial.println(pot1out" ");
+  //Serial.println(pot1lvl" ");
+  //Serial.println(pot1filt);
   //Serial.println();
 }
 
