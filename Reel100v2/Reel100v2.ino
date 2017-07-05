@@ -26,7 +26,6 @@ extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 
 unsigned long button_time = 0;  // the last time the output pin was toggled
 unsigned long last_button_time = 50;
-
 static uint8_t startIndex = 0;
 
 void setup() {
