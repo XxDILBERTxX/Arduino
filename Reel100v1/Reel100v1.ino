@@ -83,7 +83,11 @@ void loop()
   }
   
   // do some periodic updates
+<<<<<<< HEAD
   EVERY_N_MILLISECONDS( 30 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+=======
+  EVERY_N_MILLISECONDS( 40 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+>>>>>>> ce0dfa51a240a3f277fffb128ecc2edd40317736
 }
 
 void showLED()
