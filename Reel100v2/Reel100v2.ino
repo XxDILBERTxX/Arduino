@@ -6,8 +6,13 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS 159
 CRGB leds[NUM_LEDS];
 #define FRAMES_PER_SECOND 120
+
 uint8_t brightness = 128;
 uint8_t fadeBy = 15;
+uint8_t BeatsPerMinute = 40;
+
+int SETTING[] = {128, 15, 40};
+uint8_t cSetting = 3;
 
 IRrecv irrecv(11);
 decode_results results;
@@ -26,8 +31,9 @@ static uint8_t startIndex = 0;
 
 void setup() {
   delay(3000);
+  //Serial.begin(9600);
   FastLED.addLeds<WS2801,10,12,RGB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(brightness);
+  FastLED.setBrightness(SETTING[0]);
   irrecv.enableIRIn(); // Start the receiver
   palette = RainbowColors_p;
   cBlending = LINEARBLEND;
@@ -52,11 +58,11 @@ void loop()
     if (button_time - last_button_time > 250) {
       if (results.value == 0xFD8877) //Up
       {
-        //Do stuff
+        SETTING[cSetting] = (SETTING[cSetting] + 1) % 100;
       }
       if (results.value == 0xFD9867) //Down
       {
-        //Do stuff
+        SETTING[cSetting] = (SETTING[cSetting] - 1) % 100;
       }
       if (results.value == 0xFDA857) //Ok
       {
@@ -64,21 +70,22 @@ void loop()
       }
       if (results.value == 0xFD28D7) //Left
       {
-        //Do stuff
+        cSetting = (cSetting - 1) % ARRAY_SIZE(SETTING);
       }
       if (results.value == 0xFD6897) //Right
       {
-        //Do stuff
+        cSetting = (cSetting + 1) % ARRAY_SIZE(SETTING);
       }
       if (results.value == 0xFD30CF) //*
       {
-        gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
+        gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE(gPatterns);
       }
       if (results.value == 0xFD708F) //#
       {
         ChangePalette();
       }
       last_button_time = button_time;
+      //Serial.println(SETTING[cSetting]);
     }
     irrecv.resume(); // Receive the next value
   }
@@ -98,18 +105,18 @@ void showLED()
 void confetti() 
 {
   // random colored speckles that blink in and fade smoothly
-  fadeToBlackBy( leds, NUM_LEDS, fadeBy);
+  fadeToBlackBy(leds, NUM_LEDS, SETTING[1]);
   int pos = random16(NUM_LEDS);
-  leds[pos] += CHSV( gHue + random8(64), 200, 255);
+  leds[pos] += CHSV(gHue + random8(64), 200, 255);
   showLED();
 }
 
 void sinelon()
 {
   // a colored dot sweeping back and forth, with fading trails
-  fadeToBlackBy( leds, NUM_LEDS, fadeBy);
-  int pos = beatsin16(13,0,NUM_LEDS);
-  leds[pos] += CHSV( gHue, 255, 192);
+  fadeToBlackBy(leds, NUM_LEDS, SETTING[1]);
+  int pos = beatsin16(SETTING[2],0,NUM_LEDS);
+  leds[pos] += CHSV(gHue, 255, 192);
   showLED(); 
 }
 
@@ -117,15 +124,15 @@ void cylon()
 {
   // a colored dot sweeping back and forth, with fading trails
   for(int i = 0; i < NUM_LEDS; i++) {
-		leds[i] = CHSV( gHue++, 255, 192);
+		leds[i] = CHSV(gHue++, 255, 192);
 		showLED();
-    fadeToBlackBy( leds, NUM_LEDS, fadeBy);
+    fadeToBlackBy(leds, NUM_LEDS, SETTING[1]);
   }
   // Now the otherway
   for(int i = (NUM_LEDS)-1; i >= 0; i--) {
-		leds[i] = CHSV( gHue++, 255, 192);
+		leds[i] = CHSV(gHue++, 255, 192);
 		showLED(); 
-    fadeToBlackBy( leds, NUM_LEDS, fadeBy);
+    fadeToBlackBy(leds, NUM_LEDS, SETTING[1]);
   }
 }
 
@@ -133,15 +140,15 @@ void beam()
 {
   // Beam
   for(int i = 0; i < NUM_LEDS; i++) {
-		leds[i] = CHSV( gHue++, 255, 192);
+		leds[i] = CHSV(gHue++, 255, 192);
 		showLED();
-    fadeToBlackBy( leds, NUM_LEDS, fadeBy);
+    fadeToBlackBy(leds, NUM_LEDS, SETTING[1]);
   }
 }
 
 void juggle() {
   // eight colored dots, weaving in and out of sync with each other
-  fadeToBlackBy( leds, NUM_LEDS, fadeBy);
+  fadeToBlackBy(leds, NUM_LEDS, SETTING[1]);
   byte dothue = 0;
   for( int i = 0; i < 8; i++) {
     leds[beatsin16(i+7,0,NUM_LEDS)] |= CHSV(dothue, 200, 255);
@@ -156,7 +163,7 @@ void palettecolors()
   uint8_t colorIndex = startIndex;
   showLED();
   for( int i = 0; i < NUM_LEDS; i++) {
-      leds[i] = ColorFromPalette( palette, colorIndex, brightness, cBlending);
+      leds[i] = ColorFromPalette(palette, colorIndex, SETTING[0], cBlending);
       colorIndex += 3;
   } 
 }
@@ -176,8 +183,7 @@ void bpm()
 {
   // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
   //uint8_t BeatsPerMinute = map(pot1filt, 10, 990, 0, 100);
-  uint8_t BeatsPerMinute = 40;
-  uint8_t beat = beatsin8( BeatsPerMinute, 0, 255);
+  uint8_t beat = beatsin8(SETTING[2], 0, 255);
   for( int i = 0; i < NUM_LEDS; i++) { //9948
     leds[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10), cBlending);
   }
