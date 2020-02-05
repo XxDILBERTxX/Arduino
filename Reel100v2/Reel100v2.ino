@@ -12,7 +12,7 @@ uint8_t fadeBy = 15;
 uint8_t BeatsPerMinute = 40;
 
 int SETTING[] = {128, 15, 40};
-uint8_t cSetting = 3;
+uint8_t cSetting = 2;
 
 IRrecv irrecv(11);
 decode_results results;
@@ -23,14 +23,15 @@ uint8_t paletteNumber = 0;
 
 extern CRGBPalette16 myRedWhiteBluePalette;
 extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
+static uint8_t startIndex = 0;
 
 unsigned long button_time = 0;  // the last time the output pin was toggled
 unsigned long last_button_time = 50;
-static uint8_t startIndex = 0;
+unsigned long last_button_pressed = 0;
 
 void setup() {
   delay(3000);
-  //Serial.begin(9600);
+  Serial.begin(9600);
   FastLED.addLeds<WS2801,10,12,RGB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(SETTING[0]);
   irrecv.enableIRIn(); // Start the receiver
@@ -52,6 +53,12 @@ void loop()
   
   gPatterns[gCurrentPatternNumber]();
 
+   if (irrecv.decode(&results)) {
+    remote();
+   }
+
+
+/*  Original Remote Code
   if (irrecv.decode(&results)) {
     button_time = millis();
     if (button_time - last_button_time > 250) {
@@ -84,14 +91,58 @@ void loop()
         ChangePalette();
       }
       last_button_time = button_time;
-      //Serial.println(SETTING[cSetting]);
+      Serial.print(cSetting" ");
+      Serial.println(SETTING[cSetting]);
     }
     irrecv.resume(); // Receive the next value
   }
+*/
   
   // do some periodic updates
   EVERY_N_MILLISECONDS( 30 ) { gHue++; } // slowly cycle the "base color" through the rainbow
 }
+
+// New Remote code
+void remote()
+{
+  unsigned long button_pressed = results.value;
+  button_time = millis();
+  if (button_pressed == 0xFFFFFFFF){button_pressed = last_button_pressed;}
+    if (button_time - last_button_time > 250) {
+      switch (button_pressed) {
+        case 0xFD8877:  //Up
+          SETTING[cSetting] = (SETTING[cSetting] + 1) % 100;
+          break;
+        case 0xFD9867:  //Down
+          SETTING[cSetting] = (SETTING[cSetting] - 1) % 100;
+          break;
+        case 0xFDA857:  //Ok
+          
+          break;
+        case 0xFD28D7:  //Left
+          cSetting = (cSetting - 1) % ARRAY_SIZE(SETTING);
+          break;
+        case 0xFD6897:  //Right
+          cSetting = (cSetting + 1) % ARRAY_SIZE(SETTING);
+          break;
+        case 0xFD30CF:  //*
+          gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE(gPatterns);
+          break;
+        case 0xFD708F:  //#
+          ChangePalette();
+          break;
+      }
+    last_button_time = button_time;
+    last_button_pressed = button_pressed;
+    Serial.print(button_pressed, HEX);
+    Serial.write('.');
+    Serial.print(cSetting);
+    Serial.write('.');
+    Serial.println(SETTING[cSetting]);
+    }
+  irrecv.resume(); // Receive the next value
+}
+
 
 void showLED()
 { 
