@@ -24,7 +24,7 @@ uint8_t fps = 100;
 #define SPARKING 80
 
 
-IRrecv irrecv(11);
+IRrecv irrecv(3);
 decode_results results;
 
 CRGBPalette16 palette;
