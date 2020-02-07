@@ -15,7 +15,7 @@ uint8_t fps = 100;
 
 // COOLING: How much does the air cool as it rises?
 // Less cooling = taller flames.  More cooling = shorter flames.
-// Default 55, suggested range 20-100 
+// Default 55, suggested range 20-100
 #define COOLING  70
 
 // SPARKING: What chance (out of 255) is there that a new spark will be lit?
@@ -24,7 +24,7 @@ uint8_t fps = 100;
 #define SPARKING 80
 
 
-IRrecv irrecv(11);
+IRrecv irrecv(3);
 decode_results results;
 
 CRGBPalette16 palette;
@@ -42,6 +42,7 @@ unsigned long last_button_pressed = 0;
 void setup() {
   delay(3000);
   //Serial.begin(9600);
+  attachInterrupt (digitalPinToInterrupt (3), irremote, CHANGE);
   FastLED.addLeds<WS2801, 10, 12, RGB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(0);
   irrecv.enableIRIn(); // Start the receiver
@@ -68,14 +69,15 @@ void loop()
 
   gPatterns[gCurrentPatternNumber]();
 
-  if (irrecv.decode(&results)) {
-    remote();
-    irrecv.resume(); // Receive the next value
-  }
-
   // do some periodic updates
   EVERY_N_MILLISECONDS( 30 ) {
     gHue++;  // slowly cycle the "base color" through the rainbow
+  }
+}
+void irremote() {
+  if (irrecv.decode(&results)) {
+    remote();
+    irrecv.resume(); // Receive the next value
   }
 }
 
@@ -83,7 +85,7 @@ void loop()
 void remote()
 {
   unsigned long button_pressed = results.value;
-  int counter = 1;
+  int counter = 0;
   button_time = millis();
   if (button_time - last_button_time > 250) {
     if (button_pressed == 0xFFFFFFFF) {
@@ -91,7 +93,7 @@ void remote()
       counter ++;
     }
     else {
-      counter = 1;
+      counter = 10;
     }
     switch (button_pressed) {
       case 0xFD8877:  //Up

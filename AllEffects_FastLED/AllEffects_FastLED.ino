@@ -1,17 +1,16 @@
 #include "FastLED.h"
 #include <EEPROM.h>
-#define NUM_LEDS 60 
+#define NUM_LEDS 159 
 CRGB leds[NUM_LEDS];
-#define PIN 5 
 
-#define BUTTON 2
+#define BUTTON 3
 byte selectedEffect=0;
 
 void setup()
 {
-  FastLED.addLeds<WS2811, PIN, GRB>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-  pinMode(2,INPUT_PULLUP);  // internal pull-up resistor
-  attachInterrupt (digitalPinToInterrupt (BUTTON), changeEffect, CHANGE); // pressed
+  FastLED.addLeds<WS2801, 10, 12, RGB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  //pinMode(2,INPUT_PULLUP);  // internal pull-up resistor
+  attachInterrupt (digitalPinToInterrupt (BUTTON), changeEffect, CHANGE);
 }
 
 // *** REPLACE FROM HERE ***
@@ -714,28 +713,16 @@ void fadeToBlack(int ledNo, byte fadeValue) {
 
 // Apply LED color changes
 void showStrip() {
- #ifdef ADAFRUIT_NEOPIXEL_H 
-   // NeoPixel
-   strip.show();
- #endif
- #ifndef ADAFRUIT_NEOPIXEL_H
    // FastLED
    FastLED.show();
- #endif
 }
 
 // Set a LED color (not yet visible)
 void setPixel(int Pixel, byte red, byte green, byte blue) {
- #ifdef ADAFRUIT_NEOPIXEL_H 
-   // NeoPixel
-   strip.setPixelColor(Pixel, strip.Color(red, green, blue));
- #endif
- #ifndef ADAFRUIT_NEOPIXEL_H 
    // FastLED
    leds[Pixel].r = red;
    leds[Pixel].g = green;
    leds[Pixel].b = blue;
- #endif
 }
 
 // Set all LEDs to a given color and apply it (visible)
