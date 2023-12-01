@@ -49,6 +49,8 @@ void setup() {
   irrecv.enableIRIn();  // Start the receiver
   palette = RainbowColors_p;
   cBlending = LINEARBLEND;
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
@@ -75,7 +77,6 @@ void loop() {
 
   gPatterns[gCurrentPatternNumber]();
 
-  // do some periodic updates
   EVERY_N_MILLISECONDS(500) {
     gHue++;  // slowly cycle the "base color" through the rainbow
   }
