@@ -153,6 +153,11 @@ void remote() {
       case 0xFD50AF:  //9
         break;
       case 0xFDB04F:  //0
+        if (cBlending == LINEARBLEND){
+          cBlending = NOBLEND;
+        } else {
+          cBlending = LINEARBLEND;
+        }
         break;
     }
     last_button_time = button_time;
@@ -256,7 +261,7 @@ void palettecolors() {
   uint8_t colorIndex = startIndex;
   showLED();
   for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = ColorFromPalette(palette, colorIndex, SETTING[0], cBlending);
+    leds[i] = ColorFromPalette(palette, colorIndex, brightness, cBlending);
     colorIndex += 2;
   }
 }
@@ -380,105 +385,41 @@ void BouncingBalls() {
 
 void ChangePalette() {
   paletteNumber += 1;
-  if (paletteNumber >= 23) {
+  if (paletteNumber >= 11) {
     paletteNumber = 0;
   }
   if (paletteNumber == 0) {
     palette = RainbowColors_p;
-    cBlending = NOBLEND;
   }
   if (paletteNumber == 1) {
-    palette = RainbowColors_p;
-    cBlending = LINEARBLEND;
+    palette = RainbowStripeColors_p;
   }
   if (paletteNumber == 2) {
-    palette = RainbowStripeColors_p;
-    cBlending = NOBLEND;
+    palette = PartyColors_p;
   }
   if (paletteNumber == 3) {
-    palette = RainbowStripeColors_p;
-    cBlending = LINEARBLEND;
+    palette = HeatColors_p;
   }
   if (paletteNumber == 4) {
-    palette = PartyColors_p;
-    cBlending = NOBLEND;
+    palette = CRGBPalette16(CRGB::Black, CRGB::Blue, CRGB::Aqua, CRGB::Gray);
   }
   if (paletteNumber == 5) {
-    palette = PartyColors_p;
-    cBlending = LINEARBLEND;
+    palette = LavaColors_p;
   }
   if (paletteNumber == 6) {
-    palette = HeatColors_p;
-    cBlending = NOBLEND;
+    palette = CloudColors_p;
   }
   if (paletteNumber == 7) {
-    palette = HeatColors_p;
-    cBlending = LINEARBLEND;
+    palette = OceanColors_p;
   }
   if (paletteNumber == 8) {
-    palette = CRGBPalette16(CRGB::Black, CRGB::Blue, CRGB::Aqua, CRGB::Gray);
-    cBlending = NOBLEND;
+    palette = ForestColors_p;
   }
   if (paletteNumber == 9) {
-    palette = CRGBPalette16(CRGB::Black, CRGB::Blue, CRGB::Aqua, CRGB::Gray);
-    cBlending = LINEARBLEND;
+    palette = myRedWhiteBluePalette_p;
   }
   if (paletteNumber == 10) {
-    palette = LavaColors_p;
-    cBlending = NOBLEND;
-  }
-  if (paletteNumber == 11) {
-    palette = LavaColors_p;
-    cBlending = LINEARBLEND;
-  }
-  if (paletteNumber == 12) {
-    palette = CloudColors_p;
-    cBlending = NOBLEND;
-  }
-  if (paletteNumber == 13) {
-    palette = CloudColors_p;
-    cBlending = LINEARBLEND;
-  }
-  if (paletteNumber == 14) {
-    palette = OceanColors_p;
-    cBlending = NOBLEND;
-  }
-  if (paletteNumber == 15) {
-    palette = OceanColors_p;
-    cBlending = LINEARBLEND;
-  }
-  if (paletteNumber == 16) {
-    palette = ForestColors_p;
-    cBlending = NOBLEND;
-  }
-  if (paletteNumber == 17) {
-    palette = ForestColors_p;
-    cBlending = LINEARBLEND;
-  }
-  if (paletteNumber == 18) {
-    palette = myRedWhiteBluePalette_p;
-    cBlending = NOBLEND;
-  }
-  if (paletteNumber == 19) {
-    palette = myRedWhiteBluePalette_p;
-    cBlending = LINEARBLEND;
-  }
-  if (paletteNumber == 20) {
-    SetupTotallyRandomPalette();
-    cBlending = LINEARBLEND;
-  }
-  if (paletteNumber == 21) {
     SetupBlackAndWhiteStripedPalette();
-    cBlending = NOBLEND;
-  }
-  if (paletteNumber == 22) {
-    SetupBlackAndWhiteStripedPalette();
-    cBlending = LINEARBLEND;
-  }
-}
-void SetupTotallyRandomPalette() {
-  for (int i = 0; i < 16; i++) {
-    palette[i] = CHSV(random8(), 255, random8());
   }
 }
 void SetupBlackAndWhiteStripedPalette() {

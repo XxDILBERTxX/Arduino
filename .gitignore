@@ -7,3 +7,4 @@ __vm
 *.DS_Store
 *.vsarduino.h
 *.componentinfo.xml
+/desktop.ini
