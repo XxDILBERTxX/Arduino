@@ -1,5 +1,5 @@
 #include "FastLED.h"
-#include "IRremote.h"
+#include "IRLibAll.h" // Seeed Arduino IR
 
 FASTLED_USING_NAMESPACE
 
@@ -24,8 +24,9 @@ uint8_t fps = 100;
 #define SPARKING 80
 
 
-IRrecv irrecv(3);
-decode_results results;
+IRrecvPCI irrecv(2);
+IRdecode results;
+//decode_results results;
 
 CRGBPalette16 palette;
 TBlendType cBlending;
@@ -42,6 +43,7 @@ unsigned long last_button_pressed = 0;
 void setup() {
   delay(3000);
   //Serial.begin(9600);
+  //Serial.println(F("Ready to receive IR signals"));
   FastLED.addLeds<WS2801, 10, 12, RGB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(0);
   irrecv.enableIRIn(); // Start the receiver
@@ -51,10 +53,10 @@ void setup() {
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { BouncingBalls, firepal, palettecolors, paletteWithGlitter, bpm, confetti, cylon, beam, juggle };
+SimplePatternList gPatterns = {firepal, palettecolors, paletteWithGlitter, bpm, confetti, cylon, beam, juggle }; //BouncingBalls
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
+uint8_t gCurrentPatternNumber = 4; // Index number of which pattern is current
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 
 void loop()
@@ -67,14 +69,18 @@ void loop()
   startIndex = startIndex + 1; /* motion speed */
 
   gPatterns[gCurrentPatternNumber]();
+  
 
-  if (irrecv.decode(&results)) {
+  if (irrecv.getResults()) {
+    results.decode();           //Decode it
     remote();
-    irrecv.resume(); // Receive the next value
+    //results.dumpResults(false);  //Now print results. Use false for less detail
+    irrecv.enableIRIn();      //Restart receiver
   }
 
+
   // do some periodic updates
-  EVERY_N_MILLISECONDS( 30 ) {
+  EVERY_N_MILLISECONDS( 1000 ) {
     gHue++;  // slowly cycle the "base color" through the rainbow
   }
 }
@@ -86,6 +92,7 @@ void remote()
   int counter = 1;
   button_time = millis();
   if (button_time - last_button_time > 250) {
+    //results.dumpResults(false);  //Now print results. Use false for less detail
     if (button_pressed == 0xFFFFFFFF) {
       button_pressed = last_button_pressed;
       counter ++;
@@ -179,7 +186,7 @@ void confetti()
   // random colored speckles that blink in and fade smoothly
   fadeToBlackBy(leds, NUM_LEDS, fadeby);
   int pos = random16(NUM_LEDS);
-  leds[pos] += CHSV(gHue + random8(64), 200, 255);
+  leds[pos] += CHSV(gHue + random8(64), 255, 255);
   showLED();
 }
 
