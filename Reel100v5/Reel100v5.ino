@@ -75,7 +75,6 @@ void loop() {
 
   gPatterns[gCurrentPatternNumber]();
 
-  // do some periodic updates
   EVERY_N_MILLISECONDS(500) {
     gHue++;  // slowly cycle the "base color" through the rainbow
   }
