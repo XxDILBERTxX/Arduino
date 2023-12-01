@@ -43,7 +43,7 @@ unsigned long last_button_pressed = 0;
 void setup() {
   delay(3000);
   //Serial.begin(9600);
-  //Serial.println(F("Ready to receive IR signals"));
+  //Serial.println(F("Ready"));
   FastLED.addLeds<WS2801, 10, 12, RGB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(0);
   irrecv.enableIRIn(); // Start the receiver
@@ -80,7 +80,7 @@ void loop()
 
 
   // do some periodic updates
-  EVERY_N_MILLISECONDS( 1000 ) {
+  EVERY_N_MILLISECONDS( 100 ) {
     gHue++;  // slowly cycle the "base color" through the rainbow
   }
 }
@@ -92,7 +92,6 @@ void remote()
   int counter = 1;
   button_time = millis();
   if (button_time - last_button_time > 250) {
-    //results.dumpResults(false);  //Now print results. Use false for less detail
     if (button_pressed == 0xFFFFFFFF) {
       button_pressed = last_button_pressed;
       counter ++;
@@ -160,12 +159,6 @@ void remote()
     }
     last_button_time = button_time;
     last_button_pressed = button_pressed;
-    //Debuging Stuff
-    //Serial.print(button_pressed, HEX);
-    //Serial.write(' ');
-    //Serial.print(cSetting);
-    //Serial.write(' ');
-    //Serial.println(SETTING[cSetting]);
   }
 }
 
@@ -176,8 +169,6 @@ void showLED()
   FastLED.show();
   FastLED.delay(1000 / fps);
 }
-// fadeToBlackBy(leds, NUM_LEDS, fadeby);
-// leds[ledNo].fadeToBlackBy( fadeby );
 
 // Patterns
 
@@ -186,7 +177,7 @@ void confetti()
   // random colored speckles that blink in and fade smoothly
   fadeToBlackBy(leds, NUM_LEDS, fadeby);
   int pos = random16(NUM_LEDS);
-  leds[pos] += CHSV(gHue + random8(64), 255, 255);
+  leds[pos] += CHSV(gHue + random8(10), 255, 255);
   showLED();
 }
 
