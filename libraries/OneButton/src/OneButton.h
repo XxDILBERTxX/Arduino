@@ -18,6 +18,8 @@
 // sources of input.
 // 26.09.2018 Initialization moved into class declaration.
 // 26.09.2018 Jay M Ericsson: compiler warnings removed.
+// 29.01.2020 improvements from ShaggyDog18
+// 07.05.2023 Debouncing in one point. #118
 // -----
 
 #ifndef OneButton_h
@@ -29,7 +31,7 @@
 
 extern "C" {
 typedef void (*callbackFunction)(void);
-typedef void (*parameterizedCallbackFunction)(void*);
+typedef void (*parameterizedCallbackFunction)(void *);
 }
 
 
@@ -39,34 +41,80 @@ public:
   // ----- Constructor -----
   OneButton();
 
-  OneButton(int pin, int active, bool pullupActive = true);
+  /**
+   * Initialize the OneButton library.
+   * @param pin The pin to be used for input from a momentary button.
+   * @param activeLow Set to true when the input level is LOW when the button is pressed, Default is true.
+   * @param pullupActive Activate the internal pullup when available. Default is true.
+   */
+  explicit OneButton(const int pin, const boolean activeLow = true, const bool pullupActive = true);
 
   // ----- Set runtime parameters -----
 
-  // set # millisec after safe click is assumed.
-  void setDebounceTicks(int ticks);
+  /**
+   * set # millisec after safe click is assumed.
+   */
+  [[deprecated("Use setDebounceMs() instead.")]]
+  void setDebounceTicks(const unsigned int ms) { setDebounceMs(ms); }; // deprecated
+  void setDebounceMs(const unsigned int ms);
 
-  // set # millisec after single click is assumed.
-  void setClickTicks(int ticks);
+  /**
+   * set # millisec after single click is assumed.
+   */
+  [[deprecated("Use setClickMs() instead.")]]
+  void setClickTicks(const unsigned int ms) { setClickMs(ms); }; // deprecated
+  void setClickMs(const unsigned int ms);
 
-  // set # millisec after press is assumed.
-  void setPressTicks(int ticks);
+  /**
+   * set # millisec after press is assumed.
+   */
+  [[deprecated("Use setPressMs() instead.")]]
+  void setPressTicks(const unsigned int ms) { setPressMs(ms); }; // deprecated
+  void setPressMs(const unsigned int ms);
 
-  // attach functions that will be called when button was pressed in the
-  // specified way.
+  // ----- Attach events functions -----
+
+  /**
+   * Attach an event to be called when a single click is detected.
+   * @param newFunction This function will be called when the event has been detected.
+   */
   void attachClick(callbackFunction newFunction);
-  void attachClick(parameterizedCallbackFunction newFunction, void* parameter);
+  void attachClick(parameterizedCallbackFunction newFunction, void *parameter);
+
+  /**
+   * Attach an event to be called after a double click is detected.
+   * @param newFunction This function will be called when the event has been detected.
+   */
   void attachDoubleClick(callbackFunction newFunction);
-  void attachDoubleClick(parameterizedCallbackFunction newFunction, void* parameter);
-  void attachPress(
-      callbackFunction newFunction); // DEPRECATED, replaced by longPressStart,
-                                     // longPressStop and duringLongPress
+  void attachDoubleClick(parameterizedCallbackFunction newFunction, void *parameter);
+
+  /**
+   * Attach an event to be called after a multi click is detected.
+   * @param newFunction This function will be called when the event has been detected.
+   */
+  void attachMultiClick(callbackFunction newFunction);
+  void attachMultiClick(parameterizedCallbackFunction newFunction, void *parameter);
+
+  /**
+   * Attach an event to fire when the button is pressed and held down.
+   * @param newFunction
+   */
   void attachLongPressStart(callbackFunction newFunction);
-  void attachLongPressStart(parameterizedCallbackFunction newFunction, void* parameter);
+  void attachLongPressStart(parameterizedCallbackFunction newFunction, void *parameter);
+
+  /**
+   * Attach an event to fire as soon as the button is released after a long press.
+   * @param newFunction
+   */
   void attachLongPressStop(callbackFunction newFunction);
-  void attachLongPressStop(parameterizedCallbackFunction newFunction, void* parameter);
+  void attachLongPressStop(parameterizedCallbackFunction newFunction, void *parameter);
+
+  /**
+   * Attach an event to fire periodically while the button is held down.
+   * @param newFunction
+   */
   void attachDuringLongPress(callbackFunction newFunction);
-  void attachDuringLongPress(parameterizedCallbackFunction newFunction, void* parameter);
+  void attachDuringLongPress(parameterizedCallbackFunction newFunction, void *parameter);
 
   // ----- State machine functions -----
 
@@ -80,54 +128,110 @@ public:
    * @brief Call this function every time the input level has changed.
    * Using this function no digital input pin is checked because the current
    * level is given by the parameter.
+   * Run the finite state machine (FSM) using the given level.
    */
   void tick(bool level);
 
-  bool isLongPressed();
-  int getPressedTicks();
+
+  /**
+   * Reset the button state machine.
+   */
   void reset(void);
 
+
+  /*
+   * return number of clicks in any case: single or multiple clicks
+   */
+  int getNumberClicks(void);
+
+
+  /**
+   * @return true if we are currently handling button press flow
+   * (This allows power sensitive applications to know when it is safe to power down the main CPU)
+   */
+  bool isIdle() const { return _state == OCS_INIT; }
+
+  /**
+   * @return true when a long press is detected
+   */
+  bool isLongPressed() const { return _state == OCS_PRESS; };
+
+
 private:
-  int _pin; // hardware pin number.
-  unsigned int _debounceTicks = 50; // number of ticks for debounce times.
-  unsigned int _clickTicks = 600; // number of ticks that have to pass by
-                                  // before a click is detected.
-  unsigned int _pressTicks = 1000; // number of ticks that have to pass by
-                                   // before a long button press is detected
+  int _pin = -1;                  // hardware pin number.
+  unsigned int _debounce_ms = 50; // number of msecs for debounce times.
+  unsigned int _click_ms = 400;   // number of msecs before a click is detected.
+  unsigned int _press_ms = 800;   // number of msecs before a long button press is detected
 
-  int _buttonPressed;
-
-  bool _isLongPressed = false;
+  int _buttonPressed = 0; // this is the level of the input pin when the button is pressed.
+                          // LOW if the button connects the input pin to GND when pressed.
+                          // HIGH if the button connects the input pin to VCC when pressed.
 
   // These variables will hold functions acting as event source.
   callbackFunction _clickFunc = NULL;
   parameterizedCallbackFunction _paramClickFunc = NULL;
-  void* _clickFuncParam = NULL;
+  void *_clickFuncParam = NULL;
 
   callbackFunction _doubleClickFunc = NULL;
   parameterizedCallbackFunction _paramDoubleClickFunc = NULL;
-  void* _doubleClickFuncParam = NULL;
+  void *_doubleClickFuncParam = NULL;
 
-  callbackFunction _pressFunc = NULL;
+  callbackFunction _multiClickFunc = NULL;
+  parameterizedCallbackFunction _paramMultiClickFunc = NULL;
+  void *_multiClickFuncParam = NULL;
 
   callbackFunction _longPressStartFunc = NULL;
   parameterizedCallbackFunction _paramLongPressStartFunc = NULL;
-  void* _longPressStartFuncParam = NULL;
+  void *_longPressStartFuncParam = NULL;
 
   callbackFunction _longPressStopFunc = NULL;
   parameterizedCallbackFunction _paramLongPressStopFunc = NULL;
-  void* _longPressStopFuncParam;
+  void *_longPressStopFuncParam = NULL;
 
   callbackFunction _duringLongPressFunc = NULL;
   parameterizedCallbackFunction _paramDuringLongPressFunc = NULL;
-  void* _duringLongPressFuncParam = NULL;
+  void *_duringLongPressFuncParam = NULL;
 
   // These variables that hold information across the upcoming tick calls.
   // They are initialized once on program start and are updated every time the
   // tick function is called.
-  int _state = 0;
-  unsigned long _startTime; // will be set in state 1
-  unsigned long _stopTime; // will be set in state 2
+
+  // define FiniteStateMachine
+  enum stateMachine_t : int {
+    OCS_INIT = 0,
+    OCS_DOWN = 1, // button is down
+    OCS_UP = 2, // button is up
+    OCS_COUNT = 3,
+    OCS_PRESS = 6, // button is hold down
+    OCS_PRESSEND = 7,
+  };
+
+  /**
+   * Run the finite state machine (FSM) using the given level.
+   */
+  void _fsm(bool activeLevel);
+
+  /**
+   *  Advance to a new state.
+   */
+  void _newState(stateMachine_t nextState);
+
+  stateMachine_t _state = OCS_INIT;
+
+  int debouncedPinLevel = -1;
+  int _lastDebouncePinLevel = -1;      // used for pin debouncing
+  unsigned long _lastDebounceTime = 0; // millis()
+  unsigned long now = 0;               // millis()
+
+  unsigned long _startTime = 0; // start of current input change to checking debouncing
+  int _nClicks = 0;             // count the number of clicks with this variable
+  int _maxClicks = 1;           // max number (1, 2, multi=3) of clicks of interest by registration of event functions.
+
+public:
+  int pin() const { return _pin; };
+  stateMachine_t state() const { return _state; };
+  int debounce(const int value);
+  int debouncedValue() const { return debouncedPinLevel; };
 };
 
 #endif
