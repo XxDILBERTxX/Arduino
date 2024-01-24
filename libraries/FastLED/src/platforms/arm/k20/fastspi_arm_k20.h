@@ -1,6 +1,8 @@
 #ifndef __INC_FASTSPI_ARM_H
 #define __INC_FASTSPI_ARM_H
 
+#include "fl/namespace.h"
+
 FASTLED_NAMESPACE_BEGIN
 
 #if defined(FASTLED_TEENSY3) && defined(CORE_TEENSY)
@@ -34,8 +36,6 @@ template<int VAL> class BitWork<VAL, 0> {
 public:
 	static int highestBit() __attribute__((always_inline)) { return 0; }
 };
-
-#define MAX(A, B) (( (A) > (B) ) ? (A) : (B))
 
 #define USE_CONT 0
 // intra-frame backup data
@@ -405,7 +405,7 @@ public:
 
 	// write a block of uint8_ts out in groups of three.  len is the total number of uint8_ts to write out.  The template
 	// parameters indicate how many uint8_ts to skip at the beginning and/or end of each grouping
-	template <uint8_t FLAGS, class D, EOrder RGB_ORDER> void writePixels(PixelController<RGB_ORDER> pixels) {
+	template <uint8_t FLAGS, class D, EOrder RGB_ORDER> void writePixels(PixelController<RGB_ORDER> pixels, void* context = NULL) {
 		select();
 		int len = pixels.mLen;
 

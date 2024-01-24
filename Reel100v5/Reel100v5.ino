@@ -7,7 +7,7 @@ FASTLED_USING_NAMESPACE
 CRGB leds[NUM_LEDS];
 
 // 0Brightness, 1Fade, 2BPM, 3FPS
-int SETTING[] = { 50, 15, 40, 30 };
+int SETTING[] = { 100, 15, 40, 30 };
 uint8_t cSetting = 2;
 uint8_t brightness = 92;
 uint8_t fadeby = 10;
@@ -262,7 +262,7 @@ void palettecolors() {
   showLED();
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = ColorFromPalette(palette, colorIndex, brightness, cBlending);
-    colorIndex += 2;
+    colorIndex += 1;
   }
 }
 void paletteWithGlitter() {
