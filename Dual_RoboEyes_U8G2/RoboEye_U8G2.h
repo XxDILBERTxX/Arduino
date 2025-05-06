@@ -18,8 +18,10 @@ private:
 
   int eyeCenterX = 64;
   int eyeCenterY = 32;
-  int eyeRadius = 26;
-  int pupilRadius = 8;
+  int eyeWidth = 26;
+  int eyeHeight = 15;
+  int pupilWidth = 4;
+  int pupilHeight = 8;
 
   float targetX = 0;
   float targetY = 0;
