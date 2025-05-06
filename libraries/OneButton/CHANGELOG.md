@@ -2,7 +2,30 @@
 
 All notable changes to this project will be documented in this file starting 2021.
 
-## [2.1.0] - 2023-05-10
+## Version 2.6.1 - 2024-08-02
+
+fixing compiler error Issue #147
+
+## Version 2.6.0 - 2024-08-01
+
+* The new `setup(...)` function allows deferred initialisation.
+* The SimpleOneButton.ino includes a configuration for the Arduino Nano ESP32
+* Supporting a new press event.
+* using `bool` instead of `boolean` that is a deprecated type by Arduino.
+* changes in debouncing.
+* standard Arduino style .clang formatting in changed files.
+
+## Version 2.5.0 - 2023-12-02
+
+This release is a minor update including som smaller fixes.
+
+* Functions marked with deprecated will be removed in version 3.x
+* Formatting of source code conformint the standard Arduino IDE 2.0 formatting using .clang-format
+* Version for platform.io in sync with version for Arduino
+* Introducing the `OneButtonTiny` class for small environments with limited program space and memory.
+
+
+## Version 2.1.0 - 2023-05-10
 
 This release is a minor update as there is new internal functionality and
 some functions have been renamed.
@@ -20,22 +43,22 @@ There is no functional change on them.
 
 Many thanks to the improvements included by (**@IhorNehrutsa**)
 
-## [2.0.4] - 2022-01-22
+## Version 2.0.4 - 2022-01-22
 
 * checked for ESP32 (SimpleOneButton, InterruptOneButton, BlinkMachine)
 and included example PIN definitions for ESP32
 * Documentation changes
 
-## [2.0.3] - 2021-10-26
+## Version 2.0.3 - 2021-10-26
 
 * fixing parameter missuse and potential crash
 
-## [2.0.1] - 2021-01-31
+## Version 2.0.1 - 2021-01-31
 
 * Compiler warning removed
 * Documentation
 
-## [2.0.0] - 2021-01-22
+## Version 2.0.0 - 2021-01-22
 
 * CHANGELOG created.
 * Many thanks to the improvements included from #27 (**@aslobodyanuk**), #59 (**@ShaggyDog18**) and #73 (**@geeksville**).
