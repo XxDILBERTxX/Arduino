@@ -25,10 +25,9 @@ void loop() {
   float y = cos(millis() / 1300.0);
 
   leftEye.setTarget(x, y);
-  rightEye.setTarget(x, y); // parallel motion
+  rightEye.setTarget(x, y);
 
   leftEye.update();
   rightEye.update();
 
-  //delay(33);
 }
