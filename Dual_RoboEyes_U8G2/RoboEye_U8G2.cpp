@@ -11,17 +11,15 @@ void RoboEye_U8G2::setTarget(float normX, float normY) {
   normX = constrain(normX, -1.0, 1.0);
   normY = constrain(normY, -1.0, 1.0);
 
-  // Horizontal range: pupil stays inside eye
   targetX = normX * (eyeWidth - pupilWidth - 2);
-
-  // Vertical range: invert direction so +normY looks up on screen
-  // Since screen Y+ is downward, this needs to be negative to move "up"
-  targetY = normY * (pupilHeight - eyeHeight - 2);  // WORKS: negative value gives visible movement
+  targetY = normY * (pupilHeight - eyeHeight - 2);
 }
 
 void RoboEye_U8G2::update() {
   currentX += (targetX - currentX) * 0.5;
   currentY += (targetY - currentY) * 0.5;
+  lookX = eyeCenterX + currentX;
+  lookY = eyeCenterY + currentY;
 
   updateBlink();
   drawEye();
@@ -47,15 +45,15 @@ void RoboEye_U8G2::updateBlink() {
 void RoboEye_U8G2::drawEye() {
   u8g2.clearBuffer();
   u8g2.setDrawColor(1);
-  u8g2.drawFilledEllipse(eyeCenterX, eyeCenterY, eyeWidth, eyeHeight);
-  drawPupil((int)(eyeCenterX + currentX), (int)(eyeCenterY + currentY));
+  u8g2.drawFilledEllipse(lookX, lookY, eyeWidth, eyeHeight);
+  drawPupil();
   drawLids();
   u8g2.sendBuffer();
 }
 
-void RoboEye_U8G2::drawPupil(int tx, int ty) {
+void RoboEye_U8G2::drawPupil() {
   u8g2.setDrawColor(0);
-  u8g2.drawFilledEllipse(tx, ty, pupilWidth, pupilHeight);
+  u8g2.drawFilledEllipse(lookX + currentX, lookY + currentY, pupilWidth, pupilHeight);
 }
 
 void RoboEye_U8G2::drawLids() {

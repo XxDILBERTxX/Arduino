@@ -27,6 +27,8 @@ private:
   float targetY = 0;
   float currentX = 0;
   float currentY = 0;
+  float lookX = 0;
+  float lookY = 0;
 
   unsigned long lastBlink = 0;
   bool blinking = false;
@@ -34,7 +36,7 @@ private:
 
   void updateBlink();
   void drawEye();
-  void drawPupil(int tx, int ty);
+  void drawPupil();
   void drawLids();
 };
 
