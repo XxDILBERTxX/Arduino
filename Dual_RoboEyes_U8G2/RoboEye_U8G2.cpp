@@ -92,10 +92,13 @@ void RoboEye_U8G2::drawLids() {
   int lidAmount = (blinkFrame <= 5) ? blinkFrame : (10 - blinkFrame);
   lidAmount = map(lidAmount, 0, 5, 0, eyeHeight + pupilHeight);
 
-  int top = max(0, lookY - lidAmount);
-  int bottom = min(64, lookY + lidAmount);
+  int topY = lookY - lidAmount;
+  int bottomY = lookY + lidAmount;
 
-  u8g2.drawBox(0, 0, 128, top);
-  u8g2.drawBox(0, bottom, 128, 64 - bottom);
+  // Clip so we don't draw outside the screen
+  topY = max(0, topY);
+  bottomY = min(64, bottomY);
 
+  u8g2.drawBox(0, 0, 128, topY);               // Top lid
+  u8g2.drawBox(0, bottomY, 128, 64 - bottomY); // Bottom lid
 }
