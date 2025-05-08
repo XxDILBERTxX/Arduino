@@ -28,7 +28,7 @@ void RoboEye_U8G2::update() {
 void RoboEye_U8G2::updateBlink() {
   unsigned long now = millis();
 
-  if (!blinking && now - lastBlink > 7000) {
+  if (!blinking && now - lastBlink > 8000) {
     blinking = true;
     blinkFrame = 0;
     lastBlink = now;
@@ -61,8 +61,8 @@ void RoboEye_U8G2::drawLids() {
 
   u8g2.setDrawColor(0);
   int lidAmount = (blinkFrame <= 5) ? blinkFrame : (10 - blinkFrame);
-  lidAmount = map(lidAmount, 0, 5, 0, eyeHeight - pupilHeight - (pupilHeight /2));
+  lidAmount = map(lidAmount, 0, 5, 0, eyeHeight - pupilHeight);
 
-  u8g2.drawBox(0, 0, 128, lookY + currentY - lidAmount);
-  u8g2.drawBox(0, lookY + currentY + lidAmount, 128, 64 - (lookY + currentY + lidAmount));
+  u8g2.drawBox(0, 0, 128, lookY - lidAmount);
+  u8g2.drawBox(0, lookY + lidAmount, 128, 64 - (lookY + lidAmount));
 }

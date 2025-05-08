@@ -21,8 +21,9 @@ void setup() {
 }
 
 void loop() {
+  //float rnd = random(-100,100);
   float x = sin(millis() / 1000.0);
-  float y = cos(millis() / 1300.0);
+  float y = cos(millis() / 4000.0);
 
   leftEye.setTarget(x, y);
   rightEye.setTarget(x, y);

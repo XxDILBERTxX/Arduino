@@ -19,7 +19,7 @@ private:
   int eyeCenterX = 64;
   int eyeCenterY = 32;
   int eyeWidth = 20;
-  int eyeHeight = 15; 
+  int eyeHeight = 10; 
   int pupilWidth = 4;
   int pupilHeight = 8;
 
