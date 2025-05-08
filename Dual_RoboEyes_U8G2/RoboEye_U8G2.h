@@ -18,11 +18,9 @@ private:
 
   int eyeCenterX = 64;
   int eyeCenterY = 32;
-
-  // Adjusted to allow visible pupil movement
   int eyeWidth = 20;
-  int eyeHeight = 15;     // increased for vertical motion room
-  int pupilWidth = 4;     // smaller pupil
+  int eyeHeight = 15; 
+  int pupilWidth = 4;
   int pupilHeight = 8;
 
   float targetX = 0;
