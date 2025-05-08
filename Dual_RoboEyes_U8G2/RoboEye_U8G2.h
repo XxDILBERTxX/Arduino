@@ -11,7 +11,7 @@ public:
   void begin();
   void setTarget(float normX, float normY);
   void update();
-
+  
 private:
   U8G2 &u8g2;
   bool isRightEye;
@@ -34,10 +34,13 @@ private:
   bool blinking = false;
   int blinkFrame = 0;
 
+  bool mad = false;
+
   void updateBlink();
   void drawEye();
   void drawPupil();
   void drawLids();
+
 };
 
 #endif
