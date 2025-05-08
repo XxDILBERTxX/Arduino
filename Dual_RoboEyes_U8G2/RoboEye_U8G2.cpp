@@ -61,7 +61,7 @@ void RoboEye_U8G2::drawLids() {
 
   u8g2.setDrawColor(0);
   int lidAmount = (blinkFrame <= 5) ? blinkFrame : (10 - blinkFrame);
-  lidAmount = map(lidAmount, 0, 5, 0, eyeHeight - pupilHeight);
+  lidAmount = map(lidAmount, 0, 5, 0, eyeHeight - pupilHeight - (pupilHeight /2));
 
   u8g2.drawBox(0, 0, 128, lookY + currentY - lidAmount);
   u8g2.drawBox(0, lookY + currentY + lidAmount, 128, 64 - (lookY + currentY + lidAmount));
