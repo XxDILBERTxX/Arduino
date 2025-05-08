@@ -9,7 +9,7 @@ public:
   RoboEye_U8G2(U8G2 &display, bool isRight);
 
   void begin();
-  void setTarget(float normX, float normY);  // normX and normY from -1.0 to +1.0
+  void setTarget(float normX, float normY);
   void update();
 
 private:
