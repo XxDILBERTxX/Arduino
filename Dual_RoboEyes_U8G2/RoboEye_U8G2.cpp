@@ -21,28 +21,28 @@ void RoboEye_U8G2::setTarget(float normX, float normY) {
 
 
 void RoboEye_U8G2::update() {
-  // Smoothly move pupil toward the full target
-  currentX += (targetX - currentX) * 0.5;
-  currentY += (targetY - currentY) * 0.5;
+  // 1. Move the pupil's world position (fast, direct)
+  const float pupilSpeed = 0.6;
+  currentX += (targetX - currentX) * pupilSpeed;
+  currentY += (targetY - currentY) * pupilSpeed;
 
-  // Let the eye white follow the pupil directly, but with spring dynamics
-  const float stiffness = 0.1;
-  const float damping   = 0.75;
+  float pupilWorldX = 64 + currentX;
+  float pupilWorldY = 32 + currentY;
 
-  float springX = currentX - eyeFollowX;
-  float springY = currentY - eyeFollowY;
+  // 2. Eye white follows pupil position like a head
+  const float stiffness = 0.06;
+  const float damping   = 0.85;
 
-  eyeVelX = eyeVelX * damping + springX * stiffness;
-  eyeVelY = eyeVelY * damping + springY * stiffness;
+  float deltaX = pupilWorldX - lookX;
+  float deltaY = pupilWorldY - lookY;
 
-  eyeFollowX += eyeVelX;
-  eyeFollowY += eyeVelY;
+  eyeVelX = (eyeVelX + deltaX * stiffness) * damping;
+  eyeVelY = (eyeVelY + deltaY * stiffness) * damping;
 
-  // Calculate where the eye white will be on screen
-  lookX = 64 + eyeFollowX;
-  lookY = 32 + eyeFollowY;
+  lookX += eyeVelX;
+  lookY += eyeVelY;
 
-  // Clamp to screen bounds
+  // Clamp to avoid the eye going off screen
   lookX = constrain(lookX, eyeWidth / 2, 128 - eyeWidth / 2);
   lookY = constrain(lookY, eyeHeight / 2, 64 - eyeHeight / 2);
 
@@ -87,14 +87,11 @@ void RoboEye_U8G2::drawEye() {
 void RoboEye_U8G2::drawPupil() {
   u8g2.setDrawColor(0);
 
-  // Calculate constrained offsets relative to the center of the eye
-  float maxOffsetX = eyeWidth - pupilWidth;
-  float maxOffsetY = eyeHeight - pupilHeight;
+  // Pupil is drawn based on world position (independent)
+  float pupilWorldX = 64 + currentX;
+  float pupilWorldY = 32 + currentY;
 
-  float pupilOffsetX = constrain(currentX, -maxOffsetX, maxOffsetX);
-  float pupilOffsetY = constrain(currentY, -maxOffsetY, maxOffsetY);
-
-  u8g2.drawFilledEllipse(lookX + pupilOffsetX, lookY + pupilOffsetY, pupilWidth, pupilHeight);
+  u8g2.drawFilledEllipse(pupilWorldX, pupilWorldY, pupilWidth, pupilHeight);
 }
 
 

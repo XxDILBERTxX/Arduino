@@ -34,8 +34,6 @@ private:
   float eyeVelX = 0;
   float eyeVelY = 0;
 
-
-
   unsigned long lastBlink = 0;
   bool blinking = false;
   int blinkFrame = 0;
