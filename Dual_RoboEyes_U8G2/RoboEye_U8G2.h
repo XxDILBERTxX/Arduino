@@ -27,8 +27,14 @@ private:
   float targetY = 0;
   float currentX = 0;
   float currentY = 0;
+  float eyeFollowX = 0;
+  float eyeFollowY = 0;
   float lookX = 0;
   float lookY = 0;
+  float eyeVelX = 0;
+  float eyeVelY = 0;
+
+
 
   unsigned long lastBlink = 0;
   bool blinking = false;

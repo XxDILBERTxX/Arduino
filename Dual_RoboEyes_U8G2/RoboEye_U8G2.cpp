@@ -21,21 +21,34 @@ void RoboEye_U8G2::setTarget(float normX, float normY) {
 
 
 void RoboEye_U8G2::update() {
+  // Smoothly move pupil toward the full target
   currentX += (targetX - currentX) * 0.5;
   currentY += (targetY - currentY) * 0.5;
 
-  // Calculate where the eye will be on screen
-  lookX = 64 + currentX;
-  lookY = 32 + currentY;
+  // Let the eye white follow the pupil directly, but with spring dynamics
+  const float stiffness = 0.1;
+  const float damping   = 0.75;
 
-  // Prevent drawing outside the screen
-  lookX = constrain(lookX, eyeWidth, 128 - eyeWidth);
-  lookY = constrain(lookY, eyeHeight, 64 - eyeHeight);
+  float springX = currentX - eyeFollowX;
+  float springY = currentY - eyeFollowY;
+
+  eyeVelX = eyeVelX * damping + springX * stiffness;
+  eyeVelY = eyeVelY * damping + springY * stiffness;
+
+  eyeFollowX += eyeVelX;
+  eyeFollowY += eyeVelY;
+
+  // Calculate where the eye white will be on screen
+  lookX = 64 + eyeFollowX;
+  lookY = 32 + eyeFollowY;
+
+  // Clamp to screen bounds
+  lookX = constrain(lookX, eyeWidth / 2, 128 - eyeWidth / 2);
+  lookY = constrain(lookY, eyeHeight / 2, 64 - eyeHeight / 2);
 
   updateBlink();
   drawEye();
 }
-
 
 
 void RoboEye_U8G2::updateBlink() {
