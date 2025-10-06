@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __INC_LED_SYSDEFS_H
 #define __INC_LED_SYSDEFS_H
 
@@ -6,7 +8,7 @@
 #include "fastled_config.h"
 
 // Arduino.h needed for convenience functions digitalPinToPort/BitMask/portOutputRegister and the pinMode methods.
-#if defined(ARDUINO)
+#if defined(ARDUINO) && !defined(__EMSCRIPTEN__)
 #include <Arduino.h>  // ok include
 #endif
 

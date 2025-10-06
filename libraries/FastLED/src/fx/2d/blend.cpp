@@ -5,10 +5,10 @@ are blended by the the max luminance of the components.
 */
 
 #include "blend.h"
-#include "pixelset.h"
 #include "colorutils.h"
+#include "pixelset.h"
 
-#include <stdint.h>
+#include "fl/stdint.h"
 
 namespace fl {
 
@@ -16,12 +16,12 @@ Blend2d::Blend2d(const XYMap &xymap) : Fx2d(xymap) {
     // Warning, the xyMap will be the final transrformation applied to the
     // frame. If the delegate Fx2d layers have their own transformation then
     // both will be applied.
-    mFrame = FramePtr::New(mXyMap.getTotal());
-    mFrameTransform = FramePtr::New(mXyMap.getTotal());
+    mFrame = fl::make_shared<Frame>(mXyMap.getTotal());
+    mFrameTransform = fl::make_shared<Frame>(mXyMap.getTotal());
 }
 
 Str Blend2d::fxName() const {
-    fl::Str out = "LayeredFx2d(";
+    fl::string out = "LayeredFx2d(";
     for (size_t i = 0; i < mLayers.size(); ++i) {
         out += mLayers[i].fx->fxName();
         if (i != mLayers.size() - 1) {
@@ -32,15 +32,21 @@ Str Blend2d::fxName() const {
     return out;
 }
 
-void Blend2d::add(Fx2dPtr layer, const Params& p) {
+void Blend2d::add(Fx2dPtr layer, const Params &p) {
+    if (!layer->getXYMap().isRectangularGrid()) {
+        if (!getXYMap().isRectangularGrid()) {
+            FASTLED_WARN("Blend2d has a xymap, but so does the Sub layer " << layer->fxName() << ", the sub layer will have it's map replaced with a rectangular map, to avoid double transformation.");
+            layer->setXYMap(XYMap::constructRectangularGrid(layer->getWidth(), layer->getHeight()));
+        }
+    }
     uint8_t blurAmount = p.blur_amount;
     uint8_t blurPasses = p.blur_passes;
     Entry entry(layer, blurAmount, blurPasses);
     mLayers.push_back(entry);
 }
 
-void Blend2d::add(Fx2d &layer, const Params& p) {
-    Fx2dPtr fx = Fx2dPtr::NoTracking(layer);
+void Blend2d::add(Fx2d &layer, const Params &p) {
+    Fx2dPtr fx = fl::make_shared_no_tracking(layer);
     this->add(fx, p);
 }
 
@@ -56,7 +62,7 @@ void Blend2d::draw(DrawContext context) {
         auto &fx = it->fx;
         fx->draw(tmp_ctx);
         DrawMode mode = first ? DrawMode::DRAW_MODE_OVERWRITE
-                              : DrawMode::DRAW_MODE_BLEND_BY_BLACK;
+                              : DrawMode::DRAW_MODE_BLEND_BY_MAX_BRIGHTNESS;
         first = false;
         // Apply the blur effect per effect.
         uint8_t blur_amount = it->blur_amount;
@@ -94,7 +100,7 @@ void Blend2d::draw(DrawContext context) {
 
 void Blend2d::clear() { mLayers.clear(); }
 
-bool Blend2d::setParams(Fx2dPtr fx, const Params& p) {
+bool Blend2d::setParams(Fx2dPtr fx, const Params &p) {
     uint8_t blur_amount = p.blur_amount;
     uint8_t blur_passes = p.blur_passes;
     for (auto &layer : mLayers) {
@@ -109,9 +115,9 @@ bool Blend2d::setParams(Fx2dPtr fx, const Params& p) {
     return false;
 }
 
-bool Blend2d::setParams(Fx2d &fx, const Params& p) {
+bool Blend2d::setParams(Fx2d &fx, const Params &p) {
 
-    Fx2dPtr fxPtr = Fx2dPtr::NoTracking(fx);
+    Fx2dPtr fxPtr = fl::make_shared_no_tracking(fx);
     return setParams(fxPtr, p);
 }
 

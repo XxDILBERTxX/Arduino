@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "fl/stdint.h"
 
 #include "crgb.h"
 #include "fl/namespace.h"
@@ -86,6 +86,9 @@ extern uint8_t inoise8(uint16_t x, uint16_t y);
 /// @returns scaled noise value as an unsigned integer, 0-255
 /// @param x x-axis coordinate on noise map (1D)
 extern uint8_t inoise8(uint16_t x);
+
+
+/// @} High-Resolution 8-Bit Noise Functions
 
 /// @} 8-Bit Scaled Noise Functions
 
@@ -265,4 +268,3 @@ void fill_2dnoise16(CRGB *leds, int width, int height, bool serpentine,
 /// @} Noise
 
 FASTLED_NAMESPACE_END
-

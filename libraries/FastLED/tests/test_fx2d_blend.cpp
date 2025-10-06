@@ -11,9 +11,10 @@
 #include "test.h"
 
 #include "fl/namespace.h"
+#include "fl/scoped_array.h"
+#include "fl/ostream.h"
 
 using namespace fl;
-using std::cout;
 
 // Simple test effect that fills with a solid color
 class SolidColorFx2d : public fl::Fx2d {
@@ -22,7 +23,7 @@ class SolidColorFx2d : public fl::Fx2d {
         : fl::Fx2d(fl::XYMap::constructRectangularGrid(width, height)),
           mColor(color) {}
 
-    fl::Str fxName() const override { return "SolidColorFx2d"; }
+    fl::string fxName() const override { return "SolidColorFx2d"; }
 
     void draw(Fx::DrawContext context) override {
         for (uint16_t i = 0; i < mXyMap.getTotal(); i++) {
@@ -50,7 +51,7 @@ class TestFx2D : public fl::Fx2d {
         }
     }
 
-    fl::Str fxName() const override { return "TestFx2D"; }
+    fl::string fxName() const override { return "TestFx2D"; }
 
     void draw(Fx::DrawContext context) override {
         for (uint16_t i = 0; i < mXyMap.getTotal(); i++) {
@@ -117,10 +118,10 @@ TEST_CASE("Test FX2d Layered with XYMap") {
         context.now = 0;
         blendFx.draw(context);
 
-        cout << "Layered Effect Output: " << led[0].toString().c_str() << std::endl;
-        cout << "Layered Effect Output: " << led[1].toString().c_str() << std::endl;
-        cout << "Layered Effect Output: " << led[2].toString().c_str() << std::endl;
-        cout << "Layered Effect Output: " << led[3].toString().c_str() << std::endl;
+        cout << "Layered Effect Output: " << led[0].toString().c_str() << endl;
+        cout << "Layered Effect Output: " << led[1].toString().c_str() << endl;
+        cout << "Layered Effect Output: " << led[2].toString().c_str() << endl;
+        cout << "Layered Effect Output: " << led[3].toString().c_str() << endl;
 
         // Verify the result - should be blue
         CHECK(led[0].r == 0);
@@ -160,10 +161,10 @@ TEST_CASE("Test FX2d Layered with XYMap") {
         context.now = 0;
         blendFx.draw(context);
 
-        cout << "Layered Effect Output: " << led[0].toString().c_str() << std::endl;
-        cout << "Layered Effect Output: " << led[1].toString().c_str() << std::endl;
-        cout << "Layered Effect Output: " << led[2].toString().c_str() << std::endl;
-        cout << "Layered Effect Output: " << led[3].toString().c_str() << std::endl;
+        cout << "Layered Effect Output: " << led[0].toString().c_str() << endl;
+        cout << "Layered Effect Output: " << led[1].toString().c_str() << endl;
+        cout << "Layered Effect Output: " << led[2].toString().c_str() << endl;
+        cout << "Layered Effect Output: " << led[3].toString().c_str() << endl;
 
         // Verify the result - should be blue
         CHECK(led[0].r == 0);
